@@ -5,23 +5,24 @@ import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
 import Button from "../components/Button";
 import { Navigation } from "../types";
+import { Link } from "expo-router";
 
 type Props = {
   navigation: Navigation;
 };
 
-const Dashboard = ({ navigation }: Props) => (
+const Start = ({ navigation }: Props) => (
   <Background>
     <Logo />
     <Header>Let’s start</Header>
     <Paragraph>
-      Your amazing app starts here. Open you favourite code editor and start
-      editing this project.
+      Thank you for joining our project. Hope we can help you
     </Paragraph>
-    <Button mode="outlined" onPress={() => navigation.navigate("HomeScreen")}>
-      Logout
+
+    <Button mode="outlined">
+      <Link href="/App">Start </Link>
     </Button>
   </Background>
 );
 
-export default memo(Dashboard);
+export default memo(Start);

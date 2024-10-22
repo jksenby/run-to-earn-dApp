@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Header from "../components/Header";
@@ -9,13 +9,18 @@ import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import { emailValidator, passwordValidator } from "../core/utils";
 import { Link, useNavigation } from "expo-router";
+import { Navigation } from "@/types";
 
-const LoginScreen = () => {
-  const navigation = useNavigation();
+type Props = {
+  navigation: Navigation;
+};
+
+const LoginScreen = ({ navigation }: Props) => {
+  navigation = useNavigation();
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
 
-  const _onLoginPressed = () => {
+  const _onLoginPressed = async () => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
 
@@ -25,7 +30,24 @@ const LoginScreen = () => {
       return;
     }
 
-    // navigation.navigate("Dashboard");
+    const response = await fetch("http://localhost:3000/api/login", {
+      headers: {
+        "Content-type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        password: password.value,
+        email: email.value,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error in signing up");
+    }
+
+    response.json().then(() => {
+      navigation.navigate("Start");
+    });
   };
 
   return (
@@ -38,19 +60,19 @@ const LoginScreen = () => {
 
       <TextInput
         label="Email"
-        returnKeyType="next"
+        enterKeyHint="next"
         value={email.value}
         onChangeText={(text) => setEmail({ value: text, error: "" })}
         error={!!email.error}
         errorText={email.error}
         autoCapitalize="none"
         textContentType="emailAddress"
-        keyboardType="email-address"
+        inputMode="email"
       />
 
       <TextInput
         label="Password"
-        returnKeyType="done"
+        enterKeyHint="done"
         value={password.value}
         onChangeText={(text) => setPassword({ value: text, error: "" })}
         error={!!password.error}
@@ -64,10 +86,10 @@ const LoginScreen = () => {
 
       <View style={styles.row}>
         <Text style={styles.label}>Don’t have an account? </Text>
-        <Link href="RegisterScreen">
-          <TouchableOpacity>
+        <Link href="/RegisterScreen">
+          <Pressable>
             <Text style={styles.link}>Sign up</Text>
-          </TouchableOpacity>
+          </Pressable>
         </Link>
       </View>
     </Background>

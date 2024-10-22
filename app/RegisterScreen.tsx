@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Header from "../components/Header";
@@ -15,16 +15,12 @@ import {
 } from "../core/utils";
 import { Link } from "expo-router";
 
-type Props = {
-  navigation: Navigation;
-};
-
-const RegisterScreen = ({ navigation }: Props) => {
+const RegisterScreen = () => {
   const [name, setName] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
 
-  const _onSignUpPressed = () => {
+  const _onSignUpPressed = async () => {
     const nameError = nameValidator(name.value);
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
@@ -36,12 +32,30 @@ const RegisterScreen = ({ navigation }: Props) => {
       return;
     }
 
-    navigation.navigate("Dashboard");
+    const response = await fetch("http://localhost:3000/api/register", {
+      headers: {
+        "Content-type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        name: name.value,
+        password: password.value,
+        email: email.value,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error in signing up");
+    }
+
+    response.json().then((value) => {
+      console.log(value);
+    });
   };
 
   return (
     <Background>
-      <BackButton goBack={() => navigation.navigate("HomeScreen")} />
+      <BackButton goBack={"/"} />
 
       <Logo />
 
@@ -49,7 +63,7 @@ const RegisterScreen = ({ navigation }: Props) => {
 
       <TextInput
         label="Name"
-        returnKeyType="next"
+        enterKeyHint="next"
         value={name.value}
         onChangeText={(text) => setName({ value: text, error: "" })}
         error={!!name.error}
@@ -58,19 +72,19 @@ const RegisterScreen = ({ navigation }: Props) => {
 
       <TextInput
         label="Email"
-        returnKeyType="next"
+        enterKeyHint="next"
         value={email.value}
         onChangeText={(text) => setEmail({ value: text, error: "" })}
         error={!!email.error}
         errorText={email.error}
         autoCapitalize="none"
         textContentType="emailAddress"
-        keyboardType="email-address"
+        inputMode="email"
       />
 
       <TextInput
         label="Password"
-        returnKeyType="done"
+        enterKeyHint="done"
         value={password.value}
         onChangeText={(text) => setPassword({ value: text, error: "" })}
         error={!!password.error}
@@ -84,10 +98,10 @@ const RegisterScreen = ({ navigation }: Props) => {
 
       <View style={styles.row}>
         <Text style={styles.label}>Already have an account? </Text>
-        <Link href="LoginScreen">
-          <TouchableOpacity>
+        <Link href="/LoginScreen">
+          <Pressable>
             <Text style={styles.link}>Login</Text>
-          </TouchableOpacity>
+          </Pressable>
         </Link>
       </View>
     </Background>

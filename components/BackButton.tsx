@@ -1,6 +1,6 @@
 import { Href, Link } from "expo-router";
 import React, { memo } from "react";
-import { TouchableOpacity, Image, StyleSheet } from "react-native";
+import { Pressable, Image, StyleSheet } from "react-native";
 import { getStatusBarHeight } from "react-native-status-bar-height";
 
 type Props = {
@@ -8,14 +8,14 @@ type Props = {
 };
 
 const BackButton = ({ goBack }: Props) => (
-  <TouchableOpacity style={styles.container}>
+  <Pressable style={styles.container}>
     <Link href={goBack}>
       <Image
         style={styles.image}
         source={require("../assets/images/arrow_back.png")}
       />
     </Link>
-  </TouchableOpacity>
+  </Pressable>
 );
 
 const styles = StyleSheet.create({
