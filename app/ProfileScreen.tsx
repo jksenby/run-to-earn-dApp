@@ -1,10 +1,11 @@
 import Background from "@/components/Background";
 import Paragraph from "@/components/Paragraph";
+import ProfileHeader from "@/components/ProfileHeader";
 
 const ProfileScreen = () => {
   return (
     <Background>
-      <Paragraph>as</Paragraph>
+      <ProfileHeader>as</ProfileHeader>
     </Background>
   );
 };

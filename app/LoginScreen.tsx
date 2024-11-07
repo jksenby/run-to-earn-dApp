@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
@@ -10,6 +10,7 @@ import { theme } from "../core/theme";
 import { emailValidator, passwordValidator } from "../core/utils";
 import { Link, useNavigation } from "expo-router";
 import { Navigation } from "@/types";
+import { useSDK } from "@metamask/sdk-react";
 
 type Props = {
   navigation: Navigation;
@@ -18,7 +19,27 @@ type Props = {
 const LoginScreen = ({ navigation }: Props) => {
   navigation = useNavigation();
   const [email, setEmail] = useState({ value: "", error: "" });
+  const { sdk } = useSDK();
   const [password, setPassword] = useState({ value: "", error: "" });
+  const [contract, setContract] = useState<any | null>(null);
+
+  // This is where you initialize the WalletConnect provider
+  useEffect(() => {}, []);
+
+  const connectWallet = async () => {
+    try {
+      await sdk!.connect();
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
+    }
+  };
+  const disconnectWallet = async () => {
+    try {
+      await sdk!.disconnect();
+    } catch (error) {
+      console.error("Failed to disconnect wallet:", error);
+    }
+  };
 
   const _onLoginPressed = async () => {
     const emailError = emailValidator(email.value);
@@ -30,24 +51,9 @@ const LoginScreen = ({ navigation }: Props) => {
       return;
     }
 
-    const response = await fetch("http://localhost:3000/api/login", {
-      headers: {
-        "Content-type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify({
-        password: password.value,
-        email: email.value,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Error in signing up");
-    }
-
-    response.json().then(() => {
-      navigation.navigate("Start");
-    });
+    // Here you can check if the provider and contract are ready
+    // Perform sign-in logic with MetaMask or WalletConnect
+    navigation.navigate("Start");
   };
 
   return (
@@ -82,6 +88,9 @@ const LoginScreen = ({ navigation }: Props) => {
 
       <Button mode="contained" onPress={_onLoginPressed}>
         Login
+      </Button>
+      <Button mode="contained" onPress={connectWallet}>
+        Login with metamask
       </Button>
 
       <View style={styles.row}>

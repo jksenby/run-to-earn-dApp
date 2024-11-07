@@ -13,22 +13,36 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.bt_guuys.run_to_earn",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCNtAdpUqaEh9MJUUToQxEJqoLDn3EzH6c"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.bt_guuys.run_to_earn",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCNtAdpUqaEh9MJUUToQxEJqoLDn3EzH6c"
+        }
       }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/running-icon-people-running-sports-b51846554a9ec49a1d958b5d8951601c.png"
     },
     "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "83f146d1-f3cf-43cb-aba7-244da40ba388"
+      }
     }
   }
 }
