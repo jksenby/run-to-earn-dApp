@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Header from "../components/Header";
@@ -11,24 +11,71 @@ import { emailValidator, passwordValidator } from "../core/utils";
 import { Link, useNavigation } from "expo-router";
 import { Navigation } from "@/types";
 import { useSDK } from "@metamask/sdk-react";
+import { Web3 } from "web3";
+import abi from "../constants/abi.json";
 
 type Props = {
   navigation: Navigation;
 };
 
+const contractAddress = "0x61f3D6bf8f9494346Bb934D430ad40318Ae3Ae2D";
+
 const LoginScreen = ({ navigation }: Props) => {
   navigation = useNavigation();
   const [email, setEmail] = useState({ value: "", error: "" });
-  const { sdk } = useSDK();
+  const {
+    sdk,
+    provider: ethereum,
+    status,
+    chainId,
+    account,
+    balance,
+    readOnlyCalls,
+    connected,
+  } = useSDK();
   const [password, setPassword] = useState({ value: "", error: "" });
-  const [contract, setContract] = useState<any | null>(null);
+  const [registrationStatus, setRegistrationStatus] = React.useState("");
 
-  // This is where you initialize the WalletConnect provider
-  useEffect(() => {}, []);
+  // const registration = async () => {
+  //   try {
+  //     const registerFunctionABI = {
+  //       inputs: [],
+  //       name: "register",
+  //       outputs: [],
+  //       stateMutability: "nonpayable",
+  //       type: "function",
+  //     };
+  //     const data = web3.eth.abi.encodeFunctionCall(registerFunctionABI, []);
+  //     await ethereum!.request({ method: "eth_requestAccounts" });
+  //     const from = ethereum!.selectedAddress;
+  //     const txHash = await ethereum!.request({
+  //       method: "eth_sendTransaction",
+  //       params: [
+  //         {
+  //           from,
+  //           to: contractAddress,
+  //           data,
+  //           value: "0x0",
+  //         },
+  //       ],
+  //     });
+  //     Alert.alert(`Transaction sent: ${txHash}`);
+  //     console.log(`Transaction sent: ${txHash}`);
+  //   } catch (error) {
+  //     Alert.alert(`Failed to register in RunToEarn: ${error}`);
+  //     console.error("Failed to register in RunToEarn:", error);
+  //   }
+  // };
+
+  // // This is where you initialize the WalletConnect provider
+  useEffect(() => {
+    console.log(status);
+  }, []);
 
   const connectWallet = async () => {
     try {
-      await sdk!.connect();
+      const a = await sdk?.connect();
+      console.log(sdk);
     } catch (error) {
       console.error("Failed to connect wallet:", error);
     }

@@ -1,6 +1,6 @@
-# Welcome to your Expo app 👋
+# Welcome to Run To Earn dApp 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is an [Expo](https://expo.dev) project
 
 ## Get started
 
@@ -24,6 +24,11 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Login using metamask
+
+After starting the project, you need to log in with metamask
+![alt text](./assets/images/image.png)
 
 ## Get a fresh project
 

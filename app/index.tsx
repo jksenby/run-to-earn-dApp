@@ -1,115 +1,69 @@
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useState } from "react";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import Paragraph from "../components/Paragraph";
 import { Link } from "expo-router";
-import "expo-router/entry";
-import "node-libs-expo/globals";
-import "react-native-url-polyfill/auto";
-import "react-native-get-random-values";
-
-import {
-  MetaMaskProvider,
-  SDKConfigProvider,
-  useSDKConfig,
-} from "@metamask/sdk-react";
-import { AppState, AppStateStatus, Linking, LogBox } from "react-native";
-import { StorageManagerRN } from "../StorageManagerRN";
-
-LogBox.ignoreLogs([
-  "Possible Unhandled Promise Rejection",
-  "Message ignored because invalid key exchange status",
-  "MetaMask: 'ethereum._metamask' exposes",
-  "`new NativeEventEmitter()` was called with a non-null",
-]);
-
-let canOpenLink = true;
-
-const WithSDKConfig = ({ children }: { children: React.ReactNode }) => {
-  const {
-    socketServer,
-    infuraAPIKey,
-    useDeeplink,
-    debug,
-    checkInstallationImmediately,
-  } = useSDKConfig();
-
-  return (
-    <MetaMaskProvider
-      debug={debug}
-      sdkOptions={{
-        communicationServerUrl: socketServer,
-        enableAnalytics: true,
-        infuraAPIKey,
-        readonlyRPCMap: {
-          "0x539": process.env.NEXT_PUBLIC_PROVIDER_RPCURL ?? "",
-        },
-        logging: {
-          developerMode: true,
-          plaintext: true,
-        },
-        openDeeplink: (link: string, _target?: string) => {
-          console.debug(`App::openDeepLink() ${link}`);
-          if (canOpenLink) {
-            Linking.openURL(link);
-          } else {
-            console.debug(
-              "useBlockchainProiver::openDeepLink app is not active - skip link",
-              link
-            );
-          }
-        },
-        useDeeplink,
-        checkInstallationImmediately,
-        storage: {
-          enabled: true,
-          storageManager: new StorageManagerRN(),
-        },
-        dappMetadata: {
-          name: "expo-demo",
-        },
-        i18nOptions: {
-          enabled: true,
-        },
-      }}
-    >
-      {children}
-    </MetaMaskProvider>
-  );
-};
+import { Pedometer } from "expo-sensors";
 
 const HomeScreen = () => {
-  const handleAppState = (appState: AppStateStatus) => {
-    canOpenLink = appState === "active";
-    console.debug(`AppState change: ${appState} canOpenLink=${canOpenLink}`);
+  const [isPedometerAvailable, setIsPedometerAvailable] = useState("checking");
+  const [pastStepCount, setPastStepCount] = useState(0);
+  const [currentStepCount, setCurrentStepCount] = useState(0);
+
+  const subscribe = async () => {
+    const isAvailable = await Pedometer.isAvailableAsync();
+    setIsPedometerAvailable(String(isAvailable));
+
+    if (isAvailable) {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 1);
+
+      const pastStepCountResult = await Pedometer.getStepCountAsync(start, end);
+      if (pastStepCountResult) {
+        setPastStepCount(pastStepCountResult.steps);
+      }
+
+      return Pedometer.watchStepCount((result) => {
+        setCurrentStepCount(result.steps);
+      });
+    }
   };
 
   useEffect(() => {
-    const subscription = AppState.addEventListener("change", handleAppState);
+    const subscription = subscribe();
+
+    console.log(process.env.INFURA_API_KEY);
 
     return () => {
-      subscription.remove();
+      if (!!subscription) {
+        subscription.then((subscription) => {
+          subscription?.remove();
+        });
+      }
     };
   }, []);
   return (
-    <SDKConfigProvider initialInfuraKey={"c1762497ab2147e1b4f60f74da1482ac"}>
-      <WithSDKConfig>
-        <Background>
-          <Logo />
-          <Header>Run to earn</Header>
+    <Background>
+      <Logo />
+      <Header>Run to earn</Header>
 
-          <Paragraph>Join us!</Paragraph>
-          <Button mode="contained">
-            <Link href="/LoginScreen">Login</Link>
-          </Button>
-          <Button mode="outlined">
-            <Link href="/RegisterScreen">Sign Up</Link>
-          </Button>
-        </Background>
-      </WithSDKConfig>
-    </SDKConfigProvider>
+      <Paragraph>
+        Pedometer.isAvailableAsync(): {isPedometerAvailable}
+      </Paragraph>
+      <Paragraph>Steps taken in the last 24 hours: {pastStepCount}</Paragraph>
+      <Paragraph>Walk! And watch this go up: {currentStepCount}</Paragraph>
+
+      <Paragraph>Join us!</Paragraph>
+      <Button mode="contained">
+        <Link href="/LoginScreen">Login</Link>
+      </Button>
+      <Button mode="outlined">
+        <Link href="/RegisterScreen">Sign Up</Link>
+      </Button>
+    </Background>
   );
 };
 
